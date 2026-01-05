@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: UserModule API
+  version: '1.0'
+  description: API pour gestion des utilisateurs, dashboard admin et horaires artisan.
+servers:
+  - url: http://localhost
+    description: Local dev
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email,password]
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    UserMinimal:
+      type: object
+      properties:
+        name:
+          type: string
+        first_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        date_naissance:
+          type: string
+          format: date
+        genre:
+          type: string
+          enum: [masculin, femnin]
+    Competence:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+paths:
+  /api/login:
+    post:
+      summary: Authentification (récupère token)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /api/logout:
+    post:
+      summary: Déconnexion (supprime tokens)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Déconnecté
+
+  /api/register/client:
+    post:
+      summary: Créer un utilisateur de type client
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserMinimal'
+      responses:
+        '201':
+          description: Client créé
+
+  /api/register/artisan:
+    post:
+      summary: Créer un utilisateur de type artisan (multipart avec fichiers)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                first_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                date_naissance:
+                  type: string
+                  format: date
+                genre:
+                  type: string
+                profil:
+                  type: string
+                  format: binary
+                diplome:
+                  type: string
+                  format: binary
+                identification:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Artisan créé
+
+  /api/dashboard/competences:
+    get:
+      summary: Liste des compétences (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  competences:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Competence'
+    post:
+      summary: Créer une compétence (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Créé
+
+  /api/dashboard/competences/{competence}:
+    get:
+      summary: Récupère une compétence (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: competence
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Compétence
+    put:
+      summary: Mettre à jour une compétence (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: competence
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Mis à jour
+    delete:
+      summary: Supprimer une compétence (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: competence
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supprimé
+
+  /api/dashboard/metiers:
+    get:
+      summary: Liste des métiers (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste
+    post:
+      summary: Créer un métier (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Créé
+
+  /api/dashboard/langues:
+    get:
+      summary: Liste des langues (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste
+    post:
+      summary: Créer une langue (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Créé
+
+  /api/dashboard/zoneServices:
+    get:
+      summary: Liste des zones de service (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste
+    post:
+      summary: Créer une zone de service (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Créé
+
+  /api/artisans/{artisan}/horaires:
+    get:
+      summary: Lister horaires d'un artisan
+      parameters:
+        - in: path
+          name: artisan
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des horaires
+    post:
+      summary: Créer horaire pour artisan
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                day:
+                  type: string
+                from:
+                  type: string
+                to:
+                  type: string
+      responses:
+        '201':
+          description: Créé
+
+  /api/user/{user}/profil:
+    get:
+      summary: Récupère le profil d'un utilisateur
+      parameters:
+        - in: path
+          name: user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Profil
+
+security:
+  - {}

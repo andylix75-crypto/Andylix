@@ -1,0 +1,239 @@
+{
+  "info": {
+    "name": "UserModule API - Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Register Client",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Test Client", "type": "text" },
+            { "key": "first_name", "value": "Client", "type": "text" },
+            { "key": "email", "value": "client@example.com", "type": "text" },
+            { "key": "password", "value": "secret123", "type": "text" },
+            { "key": "phone", "value": "0612345678", "type": "text" },
+            { "key": "adresse", "value": "1 rue Exemple", "type": "text" },
+            { "key": "langue", "value": "francais", "type": "text" },
+            { "key": "date_naissance", "value": "1990-01-01", "type": "text" },
+            { "key": "genre", "value": "masculin", "type": "text" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/register/client", "host": ["{{baseUrl}}"], "path": ["api","register","client"] }
+      }
+    },
+    {
+      "name": "Register Artisan",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Test Artisan", "type": "text" },
+            { "key": "first_name", "value": "Artisan", "type": "text" },
+            { "key": "email", "value": "artisan@example.com", "type": "text" },
+            { "key": "password", "value": "secret123", "type": "text" },
+            { "key": "phone", "value": "0612345679", "type": "text" },
+            { "key": "adresse", "value": "2 rue Artisan", "type": "text" },
+            { "key": "langue", "value": "francais", "type": "text" },
+            { "key": "date_naissance", "value": "1990-01-01", "type": "text" },
+            { "key": "genre", "value": "masculin", "type": "text" },
+            { "key": "profil", "type": "file", "src": ["C:/path/to/avatar.jpg"] },
+            { "key": "diplome", "type": "file", "src": ["C:/path/to/diplome.pdf"] },
+            { "key": "identification", "type": "file", "src": ["C:/path/to/id.jpg"] },
+            { "key": "is_available", "value": "1", "type": "text" },
+            { "key": "ville", "value": "Paris", "type": "text" },
+            { "key": "quartier", "value": "Quartier Exemple", "type": "text" },
+            { "key": "pays", "value": "France", "type": "text" },
+            { "key": "postal", "value": "75001", "type": "text" },
+            { "key": "metier", "value": "Plombier", "type": "text" },
+            { "key": "specialite", "value": "Chauffage", "type": "text" },
+            { "key": "expérience", "value": "5", "type": "text" },
+            { "key": "entreprise", "value": "SARL Ex", "type": "text" },
+            { "key": "description", "value": "Description de l\"artisan", "type": "text" },
+            { "key": "jours[]", "value": "Lundi", "type": "text" },
+            { "key": "jours[]", "value": "Mardi", "type": "text" },
+            { "key": "is_urgent", "value": "0", "type": "text" },
+            { "key": "is_week_end", "value": "0", "type": "text" },
+            { "key": "is_feries", "value": "0", "type": "text" },
+            { "key": "mode_payment", "value": "card", "type": "text" },
+            { "key": "is_payment_sequestre", "value": "0", "type": "text" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/register/artisan", "host": ["{{baseUrl}}"], "path": ["api","register","artisan"] }
+      }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "pm.test('Status is 201', function() { pm.response.to.have.status(201); });",
+              "pm.test('Token is present', function() { pm.expect(json.token).to.exist; });",
+              "pm.test('User is present', function() { pm.expect(json.user).to.exist; });",
+              "pm.test('Documents paths present', function() { pm.expect(json.documents).to.be.an('object'); pm.expect(json.documents.profil).to.exist; pm.expect(json.documents.diplome).to.exist; pm.expect(json.documents.identification).to.exist; });",
+              "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "body": { "mode": "urlencoded", "urlencoded": [ { "key": "email", "value": "admin@example.com" }, { "key": "password", "value": "secret123" } ] },
+        "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api","login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Competences (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/dashboard/competences", "host": ["{{baseUrl}}"], "path": ["api","dashboard","competences"] }
+      }
+    },
+    {
+      "name": "Create Competence (protected)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [ { "key": "name", "value": "NouvelleComp" } ] },
+        "url": { "raw": "{{baseUrl}}/api/dashboard/competences", "host": ["{{baseUrl}}"], "path": ["api","dashboard","competences"] }
+      }
+    },
+    {
+      "name": "Get Competence by ID (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/dashboard/competences/1", "host": ["{{baseUrl}}"], "path": ["api","dashboard","competences","1"] }
+      }
+    },
+    {
+      "name": "Get Metiers (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/dashboard/metiers", "host": ["{{baseUrl}}"], "path": ["api","dashboard","metiers"] }
+      }
+    },
+    {
+      "name": "Create Metier (protected)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [ { "key": "name", "value": "NouveauMetier" } ] },
+        "url": { "raw": "{{baseUrl}}/api/dashboard/metiers", "host": ["{{baseUrl}}"], "path": ["api","dashboard","metiers"] }
+      }
+    },
+    {
+      "name": "Get Langues (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/dashboard/langues", "host": ["{{baseUrl}}"], "path": ["api","dashboard","langues"] }
+      }
+    },
+    {
+      "name": "Create Langue (protected)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [ { "key": "name", "value": "NouvelleLangue" } ] },
+        "url": { "raw": "{{baseUrl}}/api/dashboard/langues", "host": ["{{baseUrl}}"], "path": ["api","dashboard","langues"] }
+      }
+    },
+    {
+      "name": "Get ZoneServices (protected)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/dashboard/zoneServices", "host": ["{{baseUrl}}"], "path": ["api","dashboard","zoneServices"] }
+      }
+    },
+    {
+      "name": "Create ZoneService (protected)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [ { "key": "name", "value": "NouvelleZone" } ] },
+        "url": { "raw": "{{baseUrl}}/api/dashboard/zoneServices", "host": ["{{baseUrl}}"], "path": ["api","dashboard","zoneServices"] }
+      }
+    },
+    {
+      "name": "Get Horaires (artisan)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/artisans/1/horaires", "host": ["{{baseUrl}}"], "path": ["api","artisans","1","horaires"] }
+      }
+    }
+    ,
+    {
+      "name": "Tinker: Create Admin (terminal)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "text/plain" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "php artisan tinker --execute=\"$u=\\App\\Models\\User::create(['name'=>'Admin','first_name'=>'Admin','email'=>'admin@example.com','password'=>bcrypt('secret'),'role'=>'admin','date_naissance'=>'1990-01-01','genre'=>'masculin']); echo $u->createToken('apitoken')->plainTextToken;\""
+        },
+        "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+      },
+      "description": "Commande à exécuter en terminal (php artisan tinker) pour créer un utilisateur admin et afficher son token. Exécuter dans le dossier du projet sur le serveur local."
+    }
+  ]
+}
