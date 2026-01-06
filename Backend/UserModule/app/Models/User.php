@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,7 +23,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'first_name',
-        'profil',
+        'avatar',
         'password',
         'date_naissance',
         'email',
@@ -45,6 +46,25 @@ class User extends Authenticatable
     {
         return $this->hasOne(Admin::class);
     }
+    function langues(): BelongsToMany
+    {
+        return $this->belongsToMany(Langue::class);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Role helpers used by middlewares and tests
     public function isAdmin(): bool

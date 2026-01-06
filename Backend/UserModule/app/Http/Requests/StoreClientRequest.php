@@ -27,15 +27,16 @@ class StoreClientRequest extends FormRequest
             // users
             'name' => 'required|string|unique:users,name',
             'first_name' => 'required|string|unique:users,first_name',
-            'profil' => 'required|file',
+            'avatar' => 'required|file',
             'email' => 'required|unique:users,email|email',
             'password' => 'required|min:8',
             'phone' => 'required|integer',
             'genre' => 'required|string',
             // adresses
             'adresse' => 'required',
+            'postal'=>'required',
             // langues
-            'langue' => 'required|string',
+            'langue' => 'required|integer',
             // clients
         ];
     }
@@ -49,8 +50,8 @@ class StoreClientRequest extends FormRequest
             'first_name.string' => 'Le champ "Prénom" doit être une chaîne de caractères.',
             'first_name.unique' => 'Ce prénom est déjà utilisé.',
 
-            'profil.required' => 'Le champ "Profil" est obligatoire.',
-            'profil.file' => 'Le champ "Profil" doit être un fichier valide.',
+            'avatar.required' => 'Le champ "Profil" est obligatoire.',
+            'avatar.file' => 'Le champ "Profil" doit être un fichier valide.',
             'password.min' => 'Le mot de passe doit comporter au moins 8 caractères.',
             'phone.required' => 'numero de telephone obligatoire',
             'genre.required' => 'champ obligatoire',
@@ -58,6 +59,7 @@ class StoreClientRequest extends FormRequest
             // langue
             'langue.required' => 'champ obligatoire',
         ];
+    
     }
     protected function failedValidation(Validator $validator)
     {

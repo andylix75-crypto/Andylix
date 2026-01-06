@@ -22,10 +22,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->count(10)->has(Artisan::factory()->count(10))->create()->each(function ($user) {
-        $competence = Competences::factory()->count(3)->create();
-        $user->competences()->attach($competence);
-    });
+        User::factory()->count(10)->has(Artisan::factory()->count(10))->create();
+    //     ->each(function ($user) {
+    //     $competence = Competences::factory()->count(3)->create();
+    //     $user->competences()->attach($competence);
+    // });
         User::factory()->count(10)->has(Client::factory()->count(10))->create();
         User::factory()->count(10)->has(Admin::factory()->count(2))->create();
       //  Competences::factory(20)->create();

@@ -14,6 +14,7 @@ use App\Models\Document;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 
@@ -22,53 +23,41 @@ class Usercontroller extends Controller
 {
     function ClientRegister(StoreClientRequest $request)
     {
-        $user = User::create($request->validated());
-        // $adrresse = Adresse::create(array_merge($request->validated(), ['user_id' => $user->id]));
-        // $client = Client::create(['user_id' => $user->id]);
-        // $token = $user->createToken('Andylix');
-
-        return response()->json(
-            [
-                'succes' => 'Client authentifié avec succès !',
-                'user' => $user,
-                // 'token' => $token->plainTextToken
-            ],
-            201
-        );
+        DB::beginTransaction();
+        try {
+            $request->hasFile('avatar') ? $path = $request->file('avatar')->store('avatars', 'public') : $path = null;
+            $user = User::create(array_merge($request->validated(), ['avatar' => $path]));
+            $adrresse = Adresse::create(array_merge($request->validated(), ['user_id' => $user->id]));
+            $client = Client::create(['user_id' => $user->id]);
+            $user->langues()->attach($request->validated()['langue']);
+            $token = $user->createToken('Andylix');
+            return response()->json(
+                [
+                    'succes' => 'Client authentifié avec succès !',
+                    'user' => $user,
+                    'token' => $token->plainTextToken
+                ],
+                201
+            );
+            DB::commit();
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'echec d\'Operation !',],   501);
+            DB::rollBack();
+        }
     }
 
 
     function ArtisanRegister(StoreArtisanRequest $request)
     {
-        try {
-            $path = null;
-            $path_diplome = null;
-            $path_identification = null;
-
-            if ($request->hasFile('profil')) {
-                $path = $request->file('profil')->store('avatars', 'public');
-            }
-            if ($request->hasFile('diplome')) {
-                $path_diplome = $request->file('diplome')->store('Document/diplome', 'public');
-            }
-            if ($request->hasFile('identification')) {
-                $path_identification = $request->file('identification')->store('Document/identification', 'public');
-            }
-
-            $userData = array_merge($request->validated(), ['role' => 'artisan']);
-            if ($path) {
-                $userData['profil'] = $path;
-            }
-            $user = User::create($userData);
+            $request->hasFile('avatar') ? $path = $request->file('avatar')->store('avatars', 'public') : $path = null;
+            $request->hasFile('diplome') ? $path_diplome = $request->file('avatar')->store('Document/diplome', 'public') : $path_diplome = null;
+            $request->hasFile('identification') ? $path_identification = $request->file('avatar')->store('Document/identification', 'public') : $path_identification = null;
+            $user = User::create(array_merge($request->validated(), ['avatar' => $path]));
+            $user->langues()->attach($request->validated()['langue']);
             $adrresse = Adresse::create(array_merge($request->validated(), ['user_id' => $user->id]));
             $artisan = Artisan::create(array_merge($request->validated(), ['user_id' => $user->id]));
-            // Create document record only if at least one file was uploaded
             if ($path_diplome || $path_identification) {
-                Document::create([
-                    'identification' => $path_identification,
-                    'diplome' => $path_diplome,
-                    'artisan_id' => $artisan->id,
-                ]);
+                Document::create(['identification' => $path_identification, 'diplome' => $path_diplome, 'artisan_id' => $artisan->id]);
             }
             Auth::login($user, $remember = true);
             $token = $user->createToken('Andylix1');
@@ -86,20 +75,18 @@ class Usercontroller extends Controller
                 ],
                 201
             );
-        } catch (\Throwable $th) {
-            // Log the exception for debugging
-            Log::error($th);
+        
 
-            $message = config('app.debug') ? $th->getMessage() : 'pas d\'access au server!';
+            // $message = config('app.debug') ? $th->getMessage() : 'pas d\'access au server!';
 
-            return response()->json(
-                [
-                    'error' => $message,
-                    'status' => 500,
-                ],
-                500
-            );
-        }
+            // return response()->json(
+            //     [
+            //         'error' => $message,
+            //         'status' => 500,
+            //     ],
+            //     500
+            // );
+        
     }
 
 
@@ -138,6 +125,6 @@ class Usercontroller extends Controller
 
     function ArtisanList()
     {
-        return response()->json(Artisan::with('user')->get(),200);      
+        return response()->json(Artisan::with('user')->get(), 200);
     }
 }

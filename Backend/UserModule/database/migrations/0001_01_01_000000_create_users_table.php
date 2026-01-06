@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('first_name');
-            $table->string('profil')->nullable();
+            $table->string('avatar')->nullable();
             $table->string('password');
-            $table->date('date_naissance');
+            $table->date('date_naissance')->nullable();
             $table->string('email')->unique();
             $table->string('phone')->nullable()->unique();
             $table->boolean('is_verified')->default(false); // KYC
