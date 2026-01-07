@@ -23,9 +23,9 @@ class ArtisanFactory extends Factory
             'latitude' => fake()->latitude(),
             'longitude' => fake()->longitude(),
             'is_available' => fake()->boolean(),
-            'is_week_end' => fake()->boolean(),
-            'is_feries' => fake()->boolean(),
-            'is_ugrent' => fake()->boolean(),
+            'is_work_week_end' => fake()->boolean(),
+            'is_work_feries' => fake()->boolean(),
+            'is_work_urgent' => fake()->boolean(),
         ];
     }
 }

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->boolean('is_available')->default(true);
-            $table->boolean('is_week_end')->default(false);
-            $table->boolean('is_feries')->default(false);
-            $table->boolean('is_ugrent')->default(false);
+            $table->boolean('is_work_week_end')->default(false);
+            $table->boolean('is_work_feries')->default(false);
+            $table->boolean('is_work_urgent')->default(false);
             $table->timestamps();
         });
     }

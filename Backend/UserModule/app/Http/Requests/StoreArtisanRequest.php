@@ -26,7 +26,7 @@ class StoreArtisanRequest extends FormRequest
         return [
             'name' => 'required|string|unique:users,name',
             'first_name' => 'required|string|unique:users,first_name',
-            'profil' => 'required|file',
+            'avatar' => 'required|file',
             'date_naissance' => 'required|date',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
@@ -34,25 +34,28 @@ class StoreArtisanRequest extends FormRequest
             'genre' => 'required|string',
             'is_available' => 'required|boolean',
             // localisation
-            'ville' => 'required|string', //no
-            'quartier' => 'required|string', //no
-            'pays' => 'required|string', //no
+            'ville' => 'required|integer', //no
+            'quartier' => 'required|integer', //no
+            'pays' => 'required|integer', //no
             'adresse' => 'required|string',
             'postal' => 'required|numeric',
             // metier
-            'metier' => 'required|string', //no
-            'specialite' => 'required|string', //no
-            'expérience' => 'required|integer', //no
-            'langue' => 'required|string', //no
+            'metiers' => 'required|array',
+
+            'competences' => 'required|array',
+            'competences.*' => 'numeric',
+            'specialite' => 'required|integer',
+            'expérience' => 'required', //no
+            'langues' => 'required|array', //no
             'entreprise' => 'required|string', //no
             'description' => 'required|string', //no
             // disponibilite
             'jours' => 'required|array', //no  
             // 'heur_debut' => 'required|array|date_format:H:i', //no  
             // 'heur_fin' => 'required|array|date_format:H:i|after:heur_debut', //no  
-            'is_urgent' => 'required|boolean',
-            'is_week_end' => 'required|boolean',
-            'is_feries' => 'required|boolean',
+            'is_work_urgent' => 'required|boolean',
+            'is_work_week_end' => 'required|boolean',
+            'is_work_feries' => 'required|boolean',
             // paiement
             'mode_payment' => 'required|string',
             'is_payment_sequestre' => 'required|boolean',
@@ -72,8 +75,8 @@ class StoreArtisanRequest extends FormRequest
             'first_name.string' => 'Le champ "Prénom" doit être une chaîne de caractères.',
             'first_name.unique' => 'Ce prénom est déjà utilisé.',
 
-            'profil.required' => 'Le champ "Profil" est obligatoire.',
-            'profil.file' => 'Le champ "Profil" doit être un fichier valide.',
+            'avatar.required' => 'Le champ "Profil" est obligatoire.',
+            'avatar.file' => 'Le champ "Profil" doit être un fichier valide.',
 
             'date_naissance.required' => 'La date de naissance est obligatoire.',
             'date_naissance.date' => 'La date de naissance doit être une date valide.',

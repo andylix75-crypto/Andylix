@@ -12,14 +12,15 @@ Route::post('login', [Usercontroller::class, 'login']);
 Route::prefix('register')->group(
     function () {
         Route::post('client', [Usercontroller::class, 'ClientRegister']);
-        Route::post('artisan', [Usercontroller::class, 'ArtisanRegister']);
+        Route::post('artisan', [Usercontroller::class, 'ArtisanRegister']);//no
     }
 );
 Route::prefix('user')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [Usercontroller::class, 'logout']);
     Route::get('/profil', [Usercontroller::class, 'profil']);
-    Route::get('/profil/update', [Usercontroller::class, 'profil']);
+    Route::get('/profil/update', [Usercontroller::class, 'profil']); //no
 });
+
 
 Route::prefix('dashboard')->middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('competences', CompetenceController::class);
@@ -31,5 +32,11 @@ Route::prefix('dashboard')->middleware(['auth:sanctum', 'admin'])->group(functio
 // horaires imbriqués pour un artisan — protégés par Sanctum si besoin
 Route::apiResource('{artisan}/horaires', HoraireController::class);
 
-// public route
-Route::get('artisans', [Usercontroller::class, 'ArtisanList']);
+// public routes
+Route::prefix('public')->group(function () {
+    Route::get('artisans', [Usercontroller::class, 'ArtisanList']);
+    Route::apiResource('competences', CompetenceController::class)->only('index');
+    Route::apiResource('metiers', MetierController::class)->only('index');
+    Route::apiResource('langues', LangueController::class)->only('index');
+    Route::apiResource('zoneServices', ZoneServiceController::class)->only('index');
+});
